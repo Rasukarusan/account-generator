@@ -1,10 +1,11 @@
 <?php
 require_once dirname(__FILE__) .'/../models/Selenium/Webdriver.php';
 require_once dirname(__FILE__) .'/../models/Browsers/Gmail.php';
+require_once dirname(__FILE__) .'/../models/Browsers/Yahoo.php';
 
 class MainController {
 
-    const GENERATE_ACCOUNT_NUM = 2;
+    const GENERATE_ACCOUNT_NUM = 10;
 
     private $is_headless;
 
@@ -15,9 +16,15 @@ class MainController {
     public function main() {
         // ブラウザ起動
         $driver = Models_Webdriver::create($this->is_headless);
-        $gmail = new Models_Browser_Gmail($driver);
+        $browser_classes = [
+            'Gmail' => 'Models_Browser_Gmail', 
+            'Yahoo' => 'Models_Browser_Yahoo', 
+        ];
+        $target = 'Yahoo';
+        $browser = new $browser_classes[$target]($driver);
+        $browser->login();
         for ($i=1; $i < self::GENERATE_ACCOUNT_NUM; $i++) {
-            $result = $gmail->signup();
+            $result = $browser->signup();
             $this->writeLog($result);
         }
         // $driver->quit();
